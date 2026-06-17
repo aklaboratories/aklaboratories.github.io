@@ -170,8 +170,12 @@ img,video{display:block;max-width:100%}
 .stage.prism .glow{background:conic-gradient(from 200deg,var(--c-coral),var(--c-amber),var(--c-mint),var(--c-azure),var(--c-violet),var(--c-rose),var(--c-coral))}
 .stage.halo .glow{background:radial-gradient(circle at 50% 50%,var(--c-rose),var(--c-violet) 46%,var(--c-azure))}
 .stage.needlebox .glow{background:conic-gradient(from 160deg,var(--c-azure),var(--c-mint),var(--c-amber),var(--c-rose),var(--c-violet),var(--c-azure))}
-.nb-hero{position:relative;z-index:1;width:min(320px,62vw);margin-inline:auto}
-.nb-hero img{width:100%;height:auto;border-radius:24%;display:block}
+.nbduo{position:relative;width:min(540px,92vw);margin-inline:auto;z-index:1}
+.nbduo-main{position:relative;z-index:2;width:100%}
+.nbduo-accent{position:absolute;z-index:3;right:-9%;bottom:-17%;width:60%}
+.nbduo .shot img{border-radius:13px}
+.nbduo-main:hover{transform:translateY(-12px) scale(1.03)}
+.nbduo-accent:hover{transform:translateY(-10px) scale(1.06);z-index:6}
 .shot{display:block;transition:transform .6s var(--ease),filter .6s var(--ease)}
 .shot img{width:100%;height:auto}
 .lift{filter:drop-shadow(0 36px 60px rgba(10,12,16,.34)) drop-shadow(0 12px 22px rgba(10,12,16,.18))}
@@ -371,7 +375,10 @@ footer .mk{width:24px;height:24px;border-radius:7px;background:conic-gradient(fr
     </div>
     <div class="stage needlebox" data-reveal style="--i:2">
       <div class="glow" data-par="0.06"></div>
-      <div class="nb-hero" data-par="-0.04"><img class="lift" src="images/needlebox-icon.png" width="512" height="512" alt="Needlebox app icon"></div>
+      <div class="nbduo" data-par="-0.05">
+        <div class="shot lift nbduo-main"><img src="images/needlebox-library.png" width="1700" height="1157" alt="Needlebox Library — Originals and Collection tracks labelled with key, BPM and Camelot codes"></div>
+        <div class="shot lift nbduo-accent"><img src="images/needlebox-wheel.png" width="1700" height="1157" alt="Needlebox harmonic Camelot wheel with analyzed tracks"></div>
+      </div>
     </div>
   </div>
 </section>
