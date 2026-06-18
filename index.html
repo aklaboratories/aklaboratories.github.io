@@ -115,7 +115,7 @@ footer .logo circle{mix-blend-mode:screen}
 .hero .row{display:flex;flex-wrap:wrap;gap:14px;margin-top:clamp(32px,4.5vh,46px);align-items:center}
 /* three logos orbiting a shared centre — smooth, slow (positions circle; logos stay upright) */
 .hero-orbs{position:absolute;inset:0;z-index:1;pointer-events:none}
-.orb-orbit{position:absolute;top:54%;left:81%;width:0;height:0;will-change:transform}
+.orb-orbit{position:absolute;top:46%;left:43%;width:0;height:0;will-change:transform}
 .orb{position:absolute;left:0;top:0;aspect-ratio:1;opacity:0;transform:translate(-50%,-50%);
   transition:opacity 1.2s var(--ease);transition-delay:calc(var(--d,0)*160ms);will-change:transform}
 .orb.shown{opacity:1}
@@ -551,7 +551,7 @@ footer .flinks .sp{margin-left:auto}
   });
 })();
 
-/* hero logos orbit a shared centre — smooth + slow; first scroll gives a gentle boost */
+/* hero logos swoop behind the text in a wide circular pattern, driven by scroll */
 (function(){
   const hero=document.querySelector(".hero");if(!hero)return;
   const orbit=document.getElementById("orbit");
@@ -559,44 +559,30 @@ footer .flinks .sp{margin-left:auto}
   if(!orbit||!orbs.length)return;
   setTimeout(function(){orbs.forEach(function(o){o.classList.add("shown");});},90);
   const data=orbs.map(function(o){return {el:o,a:(parseFloat(o.getAttribute("data-ang"))||0)*Math.PI/180};});
-  function radius(){return Math.max(112,Math.min(168,window.innerWidth*0.112));}
+  function radius(){return Math.max(210,Math.min(360,window.innerWidth*0.26));}
   let r=radius();
   function place(angle){
     for(let i=0;i<data.length;i++){const d=data[i],t=d.a+angle;
       d.el.style.transform="translate(-50%,-50%) translate("+(Math.cos(t)*r).toFixed(1)+"px,"+(Math.sin(t)*r).toFixed(1)+"px)";}
   }
   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){place(-0.2);return;}
-  const BASE=0.105;                       // rad/sec ≈ 6°/s → ~60s per revolution (slow, smooth)
-  let angle=-0.2,vel=BASE,mx=0,my=0,tmx=0,tmy=0,sy=window.scrollY,last=0,raf=null,running=false;
+  const BASE=-0.2,SCROLLF=0.0095,IDLE=0.05; // angle: base + scroll(rad/px) + slow idle drift
+  let mx=0,my=0,tmx=0,tmy=0,sy=window.scrollY,tAcc=0,last=0,raf=null,running=false;
   function frame(now){
-    raf=null;const dt=Math.min(0.05,last?(now-last)/1000:0.016);last=now;
-    vel+=(BASE-vel)*Math.min(1,dt*1.5);     // ease velocity back to base (decays any boost)
-    angle+=vel*dt;
+    raf=null;const dt=Math.min(0.05,last?(now-last)/1000:0.016);last=now;tAcc+=dt;
     mx+=(tmx-mx)*0.06;my+=(tmy-my)*0.06;
-    orbit.style.transform="translate3d("+(mx*22).toFixed(1)+"px,"+(my*22+sy*0.05).toFixed(1)+"px,0)";
-    place(angle);
+    orbit.style.transform="translate3d("+(mx*18).toFixed(1)+"px,"+(my*18).toFixed(1)+"px,0)";
+    place(BASE+sy*SCROLLF+tAcc*IDLE);
     if(running)raf=requestAnimationFrame(frame);
   }
   function start(){if(running)return;running=true;last=0;raf=requestAnimationFrame(frame);}
   function stop(){running=false;if(raf)cancelAnimationFrame(raf);raf=null;}
   function vis(){return window.scrollY<hero.offsetHeight+160;}
-  place(angle);start();
+  place(BASE);start();
   window.addEventListener("mousemove",function(e){tmx=(e.clientX/window.innerWidth-0.5)*2;tmy=(e.clientY/window.innerHeight-0.5)*2;},{passive:true});
   window.addEventListener("scroll",function(){sy=window.scrollY;vis()?start():stop();},{passive:true});
   window.addEventListener("resize",function(){r=radius();},{passive:true});
   document.addEventListener("visibilitychange",function(){document.hidden?stop():(vis()&&start());});
-
-  /* first downward scroll: a gentle smooth orbit boost, briefly holding the page */
-  let burst=false;
-  function clr(){window.removeEventListener("wheel",onWheel,{capture:true});window.removeEventListener("touchmove",onTouch);window.removeEventListener("scroll",onScr);}
-  function boost(hold){if(burst)return;burst=true;clr();vel=3.0;start();
-    if(hold&&window.lenis){window.lenis.stop();setTimeout(function(){window.lenis.start();},800);}}
-  function onWheel(e){if(burst)return;if(window.scrollY<=2&&e.deltaY>0){e.preventDefault();e.stopImmediatePropagation();boost(true);}else if(window.scrollY>2)clr();}
-  function onTouch(){if(!burst&&window.scrollY<=2)boost(false);}
-  function onScr(){if(!burst&&window.scrollY>4)boost(false);}
-  window.addEventListener("wheel",onWheel,{passive:false,capture:true});
-  window.addEventListener("touchmove",onTouch,{passive:true});
-  window.addEventListener("scroll",onScr,{passive:true});
 })();
 
 /* Needlebox screenshot carousel */
