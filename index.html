@@ -113,10 +113,11 @@ footer .logo circle{mix-blend-mode:screen}
 .hero .lede{margin-top:clamp(26px,4vh,40px);max-width:50ch;font-size:clamp(1.08rem,1.55vw,1.34rem);
   color:var(--ink-2);line-height:1.6}
 .hero .row{display:flex;flex-wrap:wrap;gap:14px;margin-top:clamp(32px,4.5vh,46px);align-items:center}
-/* floating circular logos (parallax + scroll rotation) */
+/* three logos orbiting a shared centre — smooth, slow (positions circle; logos stay upright) */
 .hero-orbs{position:absolute;inset:0;z-index:1;pointer-events:none}
-.orb{position:absolute;aspect-ratio:1;opacity:0;transition:opacity 1.1s var(--ease);
-  transition-delay:calc(var(--d,0)*130ms);will-change:transform}
+.orb-orbit{position:absolute;top:54%;left:81%;width:0;height:0;will-change:transform}
+.orb{position:absolute;left:0;top:0;aspect-ratio:1;opacity:0;transform:translate(-50%,-50%);
+  transition:opacity 1.2s var(--ease);transition-delay:calc(var(--d,0)*160ms);will-change:transform}
 .orb.shown{opacity:1}
 .orb-inner{position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;
   box-shadow:0 22px 46px -18px rgba(40,36,28,.45),inset 0 0 0 1px rgba(255,255,255,.5);
@@ -125,10 +126,9 @@ footer .logo circle{mix-blend-mode:screen}
 .orb-prism .orb-inner{background:conic-gradient(from 210deg,var(--c-coral),var(--c-amber),var(--c-mint),var(--c-azure),var(--c-violet),var(--c-rose),var(--c-coral))}
 .orb-halo .orb-inner{background:radial-gradient(circle at 35% 30%,var(--c-amber),var(--c-rose) 45%,var(--c-violet) 78%,var(--c-azure))}
 .orb-prism .orb-inner::after,.orb-halo .orb-inner::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.72),transparent 46%)}
-@keyframes orbfloat{from{transform:translateY(-6px)}to{transform:translateY(8px)}}
-@keyframes orbintro{from{transform:rotate(0)}to{transform:rotate(720deg)}}
-.orb.spin .orb-inner{animation:orbfloat var(--fl,8s) var(--ease) infinite alternate,orbintro 1000ms var(--ease2) calc(var(--d,0)*120ms) 1}
+@keyframes orbfloat{from{transform:translateY(-5px)}to{transform:translateY(6px)}}
 @media(max-width:760px){.hero-orbs{display:none}}
+@media(prefers-reduced-motion:reduce){.orb-inner{animation:none}}
 
 /* ============================================================ BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:12px;padding:13px 13px 13px 24px;border-radius:999px;font-weight:600;
@@ -289,9 +289,11 @@ footer .flinks .sp{margin-left:auto}
 <!-- HERO -->
 <section class="hero" id="hero">
   <div class="hero-orbs" aria-hidden="true">
-    <div class="orb orb-prism" style="--d:0;--fl:8s;top:13%;left:70%;width:clamp(104px,13vw,162px)" data-depth="26" data-sp="0.10" data-rot="0.055"><div class="orb-inner"></div></div>
-    <div class="orb orb-nb" style="--d:1;--fl:9.4s;top:42%;left:80%;width:clamp(92px,11.5vw,142px)" data-depth="34" data-sp="-0.12" data-rot="-0.075"><div class="orb-inner"><img src="images/orb-icon.png" alt=""></div></div>
-    <div class="orb orb-halo" style="--d:2;--fl:8.7s;top:67%;left:64%;width:clamp(88px,10.5vw,128px)" data-depth="20" data-sp="0.14" data-rot="0.065"><div class="orb-inner"></div></div>
+    <div class="orb-orbit" id="orbit">
+      <div class="orb orb-prism" style="--d:0;--fl:7s;width:clamp(98px,12vw,152px)" data-ang="-90"><div class="orb-inner"></div></div>
+      <div class="orb orb-nb" style="--d:1;--fl:8.4s;width:clamp(86px,10.5vw,134px)" data-ang="30"><div class="orb-inner"><img src="images/orb-icon.png" alt=""></div></div>
+      <div class="orb orb-halo" style="--d:2;--fl:7.7s;width:clamp(82px,10vw,124px)" data-ang="150"><div class="orb-inner"></div></div>
+    </div>
   </div>
   <div class="hero-content wrap">
     <h1 data-rise style="--i:1">Built for the<br>way you <span class="it grad">hear</span>.</h1>
@@ -549,55 +551,52 @@ footer .flinks .sp{margin-left:auto}
   });
 })();
 
-/* hero floating orbs — scroll + pointer parallax at varied depths, eased drift */
+/* hero logos orbit a shared centre — smooth + slow; first scroll gives a gentle boost */
 (function(){
   const hero=document.querySelector(".hero");if(!hero)return;
-  const orbs=Array.prototype.slice.call(hero.querySelectorAll(".orb"));if(!orbs.length)return;
+  const orbit=document.getElementById("orbit");
+  const orbs=Array.prototype.slice.call(hero.querySelectorAll(".orb"));
+  if(!orbit||!orbs.length)return;
   setTimeout(function(){orbs.forEach(function(o){o.classList.add("shown");});},90);
-  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
-  const data=orbs.map(function(o){return {el:o,
-    depth:parseFloat(o.getAttribute("data-depth"))||16,
-    sp:parseFloat(o.getAttribute("data-sp"))||0.08,
-    rot:parseFloat(o.getAttribute("data-rot"))||0};});
-  let mx=0,my=0,tmx=0,tmy=0,sy=window.scrollY,raf=null;
-  function apply(){
-    raf=null;mx+=(tmx-mx)*0.08;my+=(tmy-my)*0.08;
-    for(let i=0;i<data.length;i++){const d=data[i];
-      d.el.style.transform="translate3d("+(mx*d.depth).toFixed(1)+"px,"+(sy*d.sp+my*d.depth).toFixed(1)+"px,0) rotate("+(sy*d.rot).toFixed(2)+"deg)";}
-    if(Math.abs(tmx-mx)>0.002||Math.abs(tmy-my)>0.002)sched();
+  const data=orbs.map(function(o){return {el:o,a:(parseFloat(o.getAttribute("data-ang"))||0)*Math.PI/180};});
+  function radius(){return Math.max(112,Math.min(168,window.innerWidth*0.112));}
+  let r=radius();
+  function place(angle){
+    for(let i=0;i<data.length;i++){const d=data[i],t=d.a+angle;
+      d.el.style.transform="translate(-50%,-50%) translate("+(Math.cos(t)*r).toFixed(1)+"px,"+(Math.sin(t)*r).toFixed(1)+"px)";}
   }
-  function sched(){if(!raf)raf=requestAnimationFrame(apply);}
-  window.addEventListener("mousemove",function(e){tmx=(e.clientX/window.innerWidth-0.5)*2;tmy=(e.clientY/window.innerHeight-0.5)*2;sched();},{passive:true});
-  window.addEventListener("scroll",function(){sy=window.scrollY;sched();},{passive:true});
-  window.addEventListener("resize",sched,{passive:true});
-  sched();
-})();
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){place(-0.2);return;}
+  const BASE=0.105;                       // rad/sec ≈ 6°/s → ~60s per revolution (slow, smooth)
+  let angle=-0.2,vel=BASE,mx=0,my=0,tmx=0,tmy=0,sy=window.scrollY,last=0,raf=null,running=false;
+  function frame(now){
+    raf=null;const dt=Math.min(0.05,last?(now-last)/1000:0.016);last=now;
+    vel+=(BASE-vel)*Math.min(1,dt*1.5);     // ease velocity back to base (decays any boost)
+    angle+=vel*dt;
+    mx+=(tmx-mx)*0.06;my+=(tmy-my)*0.06;
+    orbit.style.transform="translate3d("+(mx*22).toFixed(1)+"px,"+(my*22+sy*0.05).toFixed(1)+"px,0)";
+    place(angle);
+    if(running)raf=requestAnimationFrame(frame);
+  }
+  function start(){if(running)return;running=true;last=0;raf=requestAnimationFrame(frame);}
+  function stop(){running=false;if(raf)cancelAnimationFrame(raf);raf=null;}
+  function vis(){return window.scrollY<hero.offsetHeight+160;}
+  place(angle);start();
+  window.addEventListener("mousemove",function(e){tmx=(e.clientX/window.innerWidth-0.5)*2;tmy=(e.clientY/window.innerHeight-0.5)*2;},{passive:true});
+  window.addEventListener("scroll",function(){sy=window.scrollY;vis()?start():stop();},{passive:true});
+  window.addEventListener("resize",function(){r=radius();},{passive:true});
+  document.addEventListener("visibilitychange",function(){document.hidden?stop():(vis()&&start());});
 
-/* first scroll spins the logos before the page moves */
-(function(){
-  const orbs=Array.prototype.slice.call(document.querySelectorAll(".hero .orb"));
-  if(!orbs.length||window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
-  let done=false;
-  function cleanup(){
-    window.removeEventListener("wheel",onWheel,{capture:true});
-    window.removeEventListener("touchmove",onTouch);
-    window.removeEventListener("scroll",onScroll);
-  }
-  function spin(hold){
-    if(done)return;done=true;cleanup();
-    orbs.forEach(function(o){o.classList.add("spin");});
-    if(hold&&window.lenis){window.lenis.stop();setTimeout(function(){window.lenis.start();},850);}
-  }
-  function onWheel(e){
-    if(done)return;
-    if(window.scrollY<=2&&e.deltaY>0){e.preventDefault();e.stopImmediatePropagation();spin(true);}
-    else if(window.scrollY>2){cleanup();}
-  }
-  function onTouch(){if(!done&&window.scrollY<=2)spin(false);}
-  function onScroll(){if(!done&&window.scrollY>4)spin(false);}
+  /* first downward scroll: a gentle smooth orbit boost, briefly holding the page */
+  let burst=false;
+  function clr(){window.removeEventListener("wheel",onWheel,{capture:true});window.removeEventListener("touchmove",onTouch);window.removeEventListener("scroll",onScr);}
+  function boost(hold){if(burst)return;burst=true;clr();vel=3.0;start();
+    if(hold&&window.lenis){window.lenis.stop();setTimeout(function(){window.lenis.start();},800);}}
+  function onWheel(e){if(burst)return;if(window.scrollY<=2&&e.deltaY>0){e.preventDefault();e.stopImmediatePropagation();boost(true);}else if(window.scrollY>2)clr();}
+  function onTouch(){if(!burst&&window.scrollY<=2)boost(false);}
+  function onScr(){if(!burst&&window.scrollY>4)boost(false);}
   window.addEventListener("wheel",onWheel,{passive:false,capture:true});
   window.addEventListener("touchmove",onTouch,{passive:true});
-  window.addEventListener("scroll",onScroll,{passive:true});
+  window.addEventListener("scroll",onScr,{passive:true});
 })();
 
 /* Needlebox screenshot carousel */
