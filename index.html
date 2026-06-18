@@ -115,22 +115,19 @@ footer .logo circle{mix-blend-mode:screen}
 .hero .lede{margin-top:clamp(26px,4vh,40px);max-width:50ch;font-size:clamp(1.08rem,1.55vw,1.34rem);
   color:var(--ink-2);line-height:1.6}
 .hero .row{display:flex;flex-wrap:wrap;gap:14px;margin-top:clamp(32px,4.5vh,46px);align-items:center}
-.hero-foot{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center;
-  margin-top:clamp(40px,6vh,72px);padding-top:22px;border-top:1px solid var(--line)}
-.hero-foot .nm{font-weight:600;letter-spacing:-.01em}
-.hero-foot .label.sp{margin-left:auto}
-@media(max-width:640px){.hero-foot .label.sp{margin-left:0;width:100%}}
-
-/* floating circular thumbnails (parallax constellation) */
+/* floating circular logos (parallax + scroll rotation) */
 .hero-orbs{position:absolute;inset:0;z-index:1;pointer-events:none}
 .orb{position:absolute;aspect-ratio:1;opacity:0;transition:opacity 1.1s var(--ease);
   transition-delay:calc(var(--d,0)*130ms);will-change:transform}
 .orb.shown{opacity:1}
-.orb-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;
-  box-shadow:0 20px 40px -18px rgba(40,36,28,.42),inset 0 0 0 1px rgba(255,255,255,.5);
+.orb-inner{position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;
+  box-shadow:0 22px 46px -18px rgba(40,36,28,.45),inset 0 0 0 1px rgba(255,255,255,.5);
   animation:orbfloat var(--fl,7.5s) var(--ease) infinite alternate;will-change:transform}
 .orb img{width:100%;height:100%;object-fit:cover;display:block}
-@keyframes orbfloat{from{transform:translateY(-7px) rotate(-.6deg)}to{transform:translateY(9px) rotate(.6deg)}}
+.orb-prism .orb-inner{background:conic-gradient(from 210deg,var(--c-coral),var(--c-amber),var(--c-mint),var(--c-azure),var(--c-violet),var(--c-rose),var(--c-coral))}
+.orb-halo .orb-inner{background:radial-gradient(circle at 35% 30%,var(--c-amber),var(--c-rose) 45%,var(--c-violet) 78%,var(--c-azure))}
+.orb-prism .orb-inner::after,.orb-halo .orb-inner::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.72),transparent 46%)}
+@keyframes orbfloat{from{transform:translateY(-6px)}to{transform:translateY(8px)}}
 @media(max-width:760px){.hero-orbs{display:none}}
 
 /* ============================================================ BUTTONS */
@@ -292,31 +289,20 @@ footer .flinks .sp{margin-left:auto}
 <!-- HERO -->
 <section class="hero" id="hero">
   <div class="hero-orbs" aria-hidden="true">
-    <div class="orb" style="--d:0;--fl:7s;top:16%;left:4%;width:clamp(60px,7vw,98px)" data-depth="14" data-sp="0.12"><div class="orb-inner"><img src="images/orb-icon.png" alt=""></div></div>
-    <div class="orb" style="--d:1;--fl:8.2s;top:7%;left:31%;width:clamp(64px,7vw,104px)" data-depth="22" data-sp="0.18"><div class="orb-inner"><img src="images/orb-halo-compact.png" alt=""></div></div>
-    <div class="orb" style="--d:2;--fl:6.6s;top:11%;left:56%;width:clamp(56px,6.5vw,88px)" data-depth="18" data-sp="0.14"><div class="orb-inner"><img src="images/orb-prism-prod.png" alt=""></div></div>
-    <div class="orb" style="--d:3;--fl:7.6s;top:6%;left:80%;width:clamp(78px,9.5vw,124px)" data-depth="28" data-sp="0.22"><div class="orb-inner"><img src="images/orb-nb-wheel.png" alt=""></div></div>
-    <div class="orb" style="--d:2;--fl:9s;top:33%;left:85%;width:clamp(80px,10vw,132px)" data-depth="30" data-sp="-0.12"><div class="orb-inner"><img src="images/orb-nb-library.png" alt=""></div></div>
-    <div class="orb" style="--d:4;--fl:6.4s;top:50%;left:71%;width:clamp(62px,7.5vw,96px)" data-depth="16" data-sp="0.16"><div class="orb-inner"><img src="images/orb-prism-dj.png" alt=""></div></div>
-    <div class="orb" style="--d:3;--fl:8.6s;top:63%;left:87%;width:clamp(70px,8.5vw,112px)" data-depth="20" data-sp="-0.16"><div class="orb-inner"><img src="images/orb-halo.png" alt=""></div></div>
-    <div class="orb" style="--d:5;--fl:7.9s;top:78%;left:72%;width:clamp(56px,7vw,90px)" data-depth="24" data-sp="0.12"><div class="orb-inner"><img src="images/orb-nb-set.png" alt=""></div></div>
+    <div class="orb orb-prism" style="--d:0;--fl:8s;top:13%;left:70%;width:clamp(104px,13vw,162px)" data-depth="26" data-sp="0.10" data-rot="0.055"><div class="orb-inner"></div></div>
+    <div class="orb orb-nb" style="--d:1;--fl:9.4s;top:42%;left:80%;width:clamp(92px,11.5vw,142px)" data-depth="34" data-sp="-0.12" data-rot="-0.075"><div class="orb-inner"><img src="images/orb-icon.png" alt=""></div></div>
+    <div class="orb orb-halo" style="--d:2;--fl:8.7s;top:67%;left:64%;width:clamp(88px,10.5vw,128px)" data-depth="20" data-sp="0.14" data-rot="0.065"><div class="orb-inner"></div></div>
   </div>
   <div class="hero-content wrap">
     <div class="hero-top" data-reveal><span class="label">Studio for sound</span><span class="ln"></span><span class="label">macOS · 2026</span></div>
-    <h1 data-rise style="--i:1">See what<br>you're <span class="it grad">hearing</span>.</h1>
-    <p class="lede" data-reveal style="--i:2">Tiny native Mac apps that sit over your screen and react to whatever's playing — the key of a track, the colour of an album, the shape of a set.</p>
+    <h1 data-rise style="--i:1">Built for the<br>way you <span class="it grad">hear</span>.</h1>
+    <p class="lede" data-reveal style="--i:2">Three tiny native Mac apps for people who live in music — read a track's key live, wear your now-playing in glass, and key, sort and sequence your whole library.</p>
     <div class="row" data-reveal style="--i:3">
       <a class="btn btn-dark btn-magnetic" href="#download"><span>Get the apps</span>
         <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M18 10l-6 6-6-6M5 20h14"/></svg></span></a>
       <a class="btn btn-line btn-magnetic" href="#prism"><span>See them in motion</span>
         <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
     </div>
-  </div>
-  <div class="hero-foot wrap" data-reveal style="--i:4">
-    <a class="nm" href="#prism">Prism</a>
-    <a class="nm" href="#halo">Halo</a>
-    <a class="nm" href="#needlebox">Needlebox</a>
-    <span class="label sp">Three apps · one studio</span>
   </div>
 </section>
 
@@ -572,12 +558,13 @@ footer .flinks .sp{margin-left:auto}
   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
   const data=orbs.map(function(o){return {el:o,
     depth:parseFloat(o.getAttribute("data-depth"))||16,
-    sp:parseFloat(o.getAttribute("data-sp"))||0.08};});
+    sp:parseFloat(o.getAttribute("data-sp"))||0.08,
+    rot:parseFloat(o.getAttribute("data-rot"))||0};});
   let mx=0,my=0,tmx=0,tmy=0,sy=window.scrollY,raf=null;
   function apply(){
     raf=null;mx+=(tmx-mx)*0.08;my+=(tmy-my)*0.08;
     for(let i=0;i<data.length;i++){const d=data[i];
-      d.el.style.transform="translate3d("+(mx*d.depth).toFixed(1)+"px,"+(sy*d.sp+my*d.depth).toFixed(1)+"px,0)";}
+      d.el.style.transform="translate3d("+(mx*d.depth).toFixed(1)+"px,"+(sy*d.sp+my*d.depth).toFixed(1)+"px,0) rotate("+(sy*d.rot).toFixed(2)+"deg)";}
     if(Math.abs(tmx-mx)>0.002||Math.abs(tmy-my)>0.002)sched();
   }
   function sched(){if(!raf)raf=requestAnimationFrame(apply);}
