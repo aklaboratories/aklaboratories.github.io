@@ -108,8 +108,6 @@ footer .logo circle{mix-blend-mode:screen}
   border-radius:50%;filter:blur(120px);opacity:.16;pointer-events:none;
   background:conic-gradient(from 150deg,var(--c-coral),var(--c-amber),var(--c-mint),var(--c-azure),var(--c-violet),var(--c-rose),var(--c-coral))}
 .hero-content{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center}
-.hero-top{display:flex;align-items:center;gap:16px;margin-bottom:clamp(26px,4vh,42px)}
-.hero-top .ln{flex:none;width:34px;height:1px;background:var(--ink);opacity:.4}
 .hero h1{font-size:clamp(3rem,9.4vw,9.2rem);line-height:.88;letter-spacing:-.045em;font-weight:600;
   max-width:15ch;color:var(--ink)}
 .hero .lede{margin-top:clamp(26px,4vh,40px);max-width:50ch;font-size:clamp(1.08rem,1.55vw,1.34rem);
@@ -128,6 +126,8 @@ footer .logo circle{mix-blend-mode:screen}
 .orb-halo .orb-inner{background:radial-gradient(circle at 35% 30%,var(--c-amber),var(--c-rose) 45%,var(--c-violet) 78%,var(--c-azure))}
 .orb-prism .orb-inner::after,.orb-halo .orb-inner::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.72),transparent 46%)}
 @keyframes orbfloat{from{transform:translateY(-6px)}to{transform:translateY(8px)}}
+@keyframes orbintro{from{transform:rotate(0)}to{transform:rotate(720deg)}}
+.orb.spin .orb-inner{animation:orbfloat var(--fl,8s) var(--ease) infinite alternate,orbintro 1000ms var(--ease2) calc(var(--d,0)*120ms) 1}
 @media(max-width:760px){.hero-orbs{display:none}}
 
 /* ============================================================ BUTTONS */
@@ -294,9 +294,8 @@ footer .flinks .sp{margin-left:auto}
     <div class="orb orb-halo" style="--d:2;--fl:8.7s;top:67%;left:64%;width:clamp(88px,10.5vw,128px)" data-depth="20" data-sp="0.14" data-rot="0.065"><div class="orb-inner"></div></div>
   </div>
   <div class="hero-content wrap">
-    <div class="hero-top" data-reveal><span class="label">Studio for sound</span><span class="ln"></span><span class="label">macOS · 2026</span></div>
     <h1 data-rise style="--i:1">Built for the<br>way you <span class="it grad">hear</span>.</h1>
-    <p class="lede" data-reveal style="--i:2">Three tiny native Mac apps for people who live in music — read a track's key live, wear your now-playing in glass, and key, sort and sequence your whole library.</p>
+    <p class="lede" data-reveal style="--i:2">Native Mac apps for people who love music.</p>
     <div class="row" data-reveal style="--i:3">
       <a class="btn btn-dark btn-magnetic" href="#download"><span>Get the apps</span>
         <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M18 10l-6 6-6-6M5 20h14"/></svg></span></a>
@@ -478,7 +477,7 @@ footer .flinks .sp{margin-left:auto}
 (function(){
   if(typeof Lenis==="undefined"||window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   document.documentElement.style.scrollBehavior="auto";
-  const lenis=new Lenis({lerp:0.09,wheelMultiplier:1.05});
+  const lenis=new Lenis({lerp:0.09,wheelMultiplier:1.05});window.lenis=lenis;
   function raf(t){lenis.raf(t);requestAnimationFrame(raf);}
   requestAnimationFrame(raf);
   document.querySelectorAll('a[href^="#"]').forEach(function(a){
@@ -572,6 +571,33 @@ footer .flinks .sp{margin-left:auto}
   window.addEventListener("scroll",function(){sy=window.scrollY;sched();},{passive:true});
   window.addEventListener("resize",sched,{passive:true});
   sched();
+})();
+
+/* first scroll spins the logos before the page moves */
+(function(){
+  const orbs=Array.prototype.slice.call(document.querySelectorAll(".hero .orb"));
+  if(!orbs.length||window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  let done=false;
+  function cleanup(){
+    window.removeEventListener("wheel",onWheel,{capture:true});
+    window.removeEventListener("touchmove",onTouch);
+    window.removeEventListener("scroll",onScroll);
+  }
+  function spin(hold){
+    if(done)return;done=true;cleanup();
+    orbs.forEach(function(o){o.classList.add("spin");});
+    if(hold&&window.lenis){window.lenis.stop();setTimeout(function(){window.lenis.start();},850);}
+  }
+  function onWheel(e){
+    if(done)return;
+    if(window.scrollY<=2&&e.deltaY>0){e.preventDefault();e.stopImmediatePropagation();spin(true);}
+    else if(window.scrollY>2){cleanup();}
+  }
+  function onTouch(){if(!done&&window.scrollY<=2)spin(false);}
+  function onScroll(){if(!done&&window.scrollY>4)spin(false);}
+  window.addEventListener("wheel",onWheel,{passive:false,capture:true});
+  window.addEventListener("touchmove",onTouch,{passive:true});
+  window.addEventListener("scroll",onScroll,{passive:true});
 })();
 
 /* Needlebox screenshot carousel */
